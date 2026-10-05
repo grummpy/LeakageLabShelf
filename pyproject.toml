@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "leakage-lab-shelf"
+version = "0.1.0"
+description = "A local shelf of reproducible machine-learning data-leakage experiments."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["machine-learning", "data-leakage", "scikit-learn", "pandas"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    # Pinned so a second machine prints the same four-decimal scores.
+    # scipy 1.14 keeps numpy below 2.3 and avoids an lbfgs option mismatch
+    # that newer SciPy builds hit with this scikit-learn pin.
+    "numpy==2.2.6",
+    "pandas==2.3.3",
+    "scikit-learn==1.7.2",
+    "scipy==1.14.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+leakage-lab = "leakage_lab.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/grummpy/LeakageLabShelf"
+Source = "https://github.com/grummpy/LeakageLabShelf"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

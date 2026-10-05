@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leakage Lab Shelf</title>
+<style>
+:root {
+  --bg: #10161a;
+  --panel: #182126;
+  --ink: #f3eadc;
+  --muted: #b7aea0;
+  --line: #2c3840;
+  --leak: #e15b68;
+  --clean: #3cbfa0;
+  --cream: #f6f0e4;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Georgia, "Iowan Old Style", Palatino, serif;
+  line-height: 1.5;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+.cover {
+  width: 100%;
+  display: block;
+  border-radius: 8px;
+  margin-bottom: 28px;
+}
+h1 {
+  font-weight: 500;
+  font-size: 2.4rem;
+  letter-spacing: 0.01em;
+  margin: 0 0 8px;
+}
+.tagline {
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+.verbs {
+  color: var(--clean);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 0.78rem;
+  margin: 0 0 28px;
+}
+.note {
+  color: var(--muted);
+  max-width: 68ch;
+}
+article {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 22px 22px 8px;
+  margin: 22px 0;
+}
+.kicker {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+h2 {
+  margin: 4px 0 6px;
+  font-weight: 500;
+  font-size: 1.7rem;
+}
+.population {
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+.paths {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.path {
+  background: #10171b;
+  border-radius: 8px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--line);
+}
+.path.leaky { border-left-color: var(--leak); }
+.path.clean { border-left-color: var(--clean); }
+.path .name {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.path.leaky .name { color: var(--leak); }
+.path.clean .name { color: var(--clean); }
+.auc {
+  font-variant-numeric: tabular-nums;
+  font-size: 2rem;
+  margin: 2px 0;
+}
+.sub {
+  font-family: "Segoe UI", sans-serif;
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin: 0;
+}
+.gap {
+  font-family: "Segoe UI", sans-serif;
+  margin: 12px 0 0;
+}
+p { margin: 12px 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 16px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 0.92rem;
+}
+th, td {
+  text-align: left;
+  padding: 6px 8px 6px 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+td:last-child {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+footer {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+footer a { color: var(--cream); }
+@media (max-width: 700px) {
+  .paths { grid-template-columns: 1fr; }
+  h1 { font-size: 2rem; }
+}
+</style>
+</head>
+<body>
+<main>
+<img class="cover" src="cover.jpg" alt="Leakage Lab Shelf cover: a cabinet of specimen jars, one of them cracked and leaking, labeled as experiments on ROC curves, splits, and validation.">
+<h1>Leakage Lab Shelf</h1>
+<p class="tagline">Planted failure cases beside clean controls. Synthetic tables, fixed seed 42.</p>
+<p class="verbs">Inspect data flow · Trace leakage · Build cleaner models</p>
+<p class="note">Accuracy uses a probability cutoff of 0.5. ROC-AUC and average precision use the positive-class probability. A high leaky score means that pipeline failed the audit.</p>
+
+<article id="future-cost">
+<p class="kicker">Experiment 1 · Target leakage via a feature from the future</p>
+<h2>Future cost</h2>
+<p class="population">2,400 synthetic discharges</p>
+<div class="paths">
+
+<div class="path leaky">
+<p class="name">Leaky</p>
+<p class="auc">0.9712</p>
+<p class="sub">ROC-AUC</p>
+<p class="sub">Accuracy 0.8983 · AP 0.9660</p>
+<p class="sub">1800 train rows · 600 test rows</p>
+</div>
+
+
+<div class="path clean">
+<p class="name">Clean</p>
+<p class="auc">0.7325</p>
+<p class="sub">ROC-AUC</p>
+<p class="sub">Accuracy 0.6650 · AP 0.6646</p>
+<p class="sub">1800 train rows · 600 test rows</p>
+</div>
+
+</div>
+<p class="gap">ROC-AUC gap (leaky minus clean): +0.2386</p>
+<p>Readmission is decided inside the 30 days after discharge. cost_through_day_60 keeps accumulating through that window. A readmission adds a charge of 3200 on top of a smaller length-of-stay term and Gaussian noise, so the column is a soft copy of the label. Length of stay is already available at discharge and is in both models; the future column is the only thing that changes. Both paths are the same logistic regression, and the scaler is fit on the training rows only.</p>
+<p>On seed 42 the leaky ROC-AUC is 0.9712 and the clean ROC-AUC is 0.7325 (gap 0.2386) on the same 600 test rows. Accuracy at a probability cutoff of 0.5 is 0.8983 leaky and 0.6650 clean. On the test rows, cost_through_day_60 correlates with the label at 0.7644.</p>
+<table><tr><th>Test rows, shared by both paths</th><td>600</td></tr><tr><th>Test-set correlation of future cost with the label</th><td>0.7644</td></tr><tr><th>Positive rate</th><td>0.4313</td></tr></table>
+</article>
+
+
+<article id="copied-rows">
+<p class="kicker">Experiment 2 · Train/test contamination from duplicate rows</p>
+<h2>Copied rows</h2>
+<p class="population">1,200 synthetic claims; the leaky path stacks a second copy before the split</p>
+<div class="paths">
+
+<div class="path leaky">
+<p class="name">Leaky</p>
+<p class="auc">0.9617</p>
+<p class="sub">ROC-AUC</p>
+<p class="sub">Accuracy 0.8917 · AP 0.9597</p>
+<p class="sub">1680 train rows · 720 test rows</p>
+</div>
+
+
+<div class="path clean">
+<p class="name">Clean</p>
+<p class="auc">0.6978</p>
+<p class="sub">ROC-AUC</p>
+<p class="sub">Accuracy 0.6583 · AP 0.7066</p>
+<p class="sub">840 train rows · 360 test rows</p>
+</div>
+
+</div>
+<p class="gap">ROC-AUC gap (leaky minus clean): +0.2639</p>
+<p>The leaky pipeline appends a second copy of every claim, keeping the same row_id, and then takes a stratified row split. A test row can be the twin of a training row. The clean pipeline splits the original table, where each row_id appears once. Both paths train the same random forest (200 trees, min_samples_leaf=1, n_jobs=1). An exact copy has the same features as its twin, so trees that saw the twin vote its label. The card separates accuracy on those copied test rows from accuracy on the rows that were new. A logistic regression on the same two splits cannot memorize a twin; it shows what the features support when the model does not recall the row.</p>
+<p>502 of 720 leaky test rows share a row_id with training. The forest&#x27;s accuracy on those copied rows is 1.0000. On the leaky test rows that are not copies, accuracy is 0.6422. The clean split shares none; forest ROC-AUC there is 0.6978, against 0.9617 on the contaminated split. Logistic regression is 0.7377 contaminated and 0.7350 clean.</p>
+<table><tr><th>Leaky test rows also in train</th><td>502 of 720</td></tr><tr><th>Clean test rows also in train</th><td>0 of 360</td></tr><tr><th>Forest accuracy on copied leaky test rows</th><td>1.0000</td></tr><tr><th>Forest accuracy on new leaky test rows</th><td>0.6422</td></tr><tr><th>Logistic ROC-AUC, contaminated split</th><td>0.7377</td></tr><tr><th>Logistic ROC-AUC, clean split</th><td>0.7350</td></tr><tr><th>Positive rate</th><td>0.5083</td></tr></table>
+</article>
+
+
+<article id="target-encoding">
+<p class="kicker">Experiment 3 · Preprocessing fit on the full table before the split</p>
+<h2>Target encoding</h2>
+<p class="population">2,000 synthetic intake rows, one row per member id</p>
+<div class="paths">
+
+<div class="path leaky">
+<p class="name">Leaky</p>
+<p class="auc">1.0000</p>
+<p class="sub">ROC-AUC</p>
+<p class="sub">Accuracy 1.0000 · AP 1.0000</p>
+<p class="sub">1500 train rows · 500 test rows</p>
+</div>
+
+
+<div class="path clean">
+<p class="name">Clean</p>
+<p class="auc">0.7531</p>
+<p class="sub">ROC-AUC</p>
+<p class="sub">Accuracy 0.6800 · AP 0.7093</p>
+<p class="sub">1500 train rows · 500 test rows</p>
+</div>
+
+</div>
+<p class="gap">ROC-AUC gap (leaky minus clean): +0.2469</p>
+<p>member_id is a different string on every row. It identifies that row and nothing else. The leaky pipeline fits sklearn&#x27;s TargetEncoder (smooth=&#x27;auto&#x27;, target_type=&#x27;binary&#x27;) on the whole table and only then splits. For a category that appears once, the value stored by fit and read back by transform is that row&#x27;s label, so the test matrix already contains the answer. The clean pipeline splits first. The encoder sits inside a Pipeline and is fit on the training rows only. Every test id is unseen, and TargetEncoder fills unseen categories with the training prevalence, a constant on the test set. fit_transform is a different call: it cross-fits, so a row does not receive an encoding built from its own label. Cross-fitting the full table is still the wrong order when a category appears on both sides of a later split. It is not the call the leaky path makes, and on these unique ids it does not paste the label back.</p>
+<p>The encoding from fit on the full table matches the label on every row (True). Leaky ROC-AUC is 1.0000. The clean encoder is fit on 1500 training rows, and its encoding of the 500 test ids has standard deviation 0.0000. Clean ROC-AUC is 0.7531. fit_transform on the same full table correlates with the label at -0.0025.</p>
+<table><tr><th>Leaky encoding equals the label on every row</th><td>True</td></tr><tr><th>Clean test-encoding standard deviation</th><td>0.0000</td></tr><tr><th>Correlation of fit_transform(full table) with the label</th><td>-0.0025</td></tr><tr><th>Test rows, shared by both paths</th><td>500</td></tr><tr><th>Positive rate</th><td>0.4440</td></tr></table>
+</article>
+
+<footer>
+<p>Companion checker for a split you already have: <a href="https://github.com/grummpy/SplitCheck">SplitCheck</a>. This shelf does not import it.</p>
+</footer>
+</main>
+</body>
+</html>
