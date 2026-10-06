@@ -114,6 +114,23 @@ def render_markdown(cards: tuple[ExperimentCard, ...], seed: int) -> str:
     return "\n".join(parts).rstrip() + "\n"
 
 
+def render_multiseed_summary(runs: tuple[tuple[int, tuple[ExperimentCard, ...]], ...]) -> str:
+    """Summarize the predeclared seed set without selecting favorable runs."""
+
+    if not runs:
+        return ""
+    seeds = ", ".join(str(seed) for seed, _cards in runs)
+    by_slug = {card.slug: card.title for card in runs[0][1]}
+    lines = ["Predeclared multi-seed summary", f"Seeds: {seeds}", "", "| Experiment | Leaky ROC-AUC range | Clean ROC-AUC range |", "| --- | --- | --- |"]
+    for slug, title in by_slug.items():
+        leaky = [next(card for card in cards if card.slug == slug).leaky.scores.roc_auc for _seed, cards in runs]
+        clean = [next(card for card in cards if card.slug == slug).clean.scores.roc_auc for _seed, cards in runs]
+        lines.append(
+            f"| {title} | {min(leaky):.4f}–{max(leaky):.4f} | {min(clean):.4f}–{max(clean):.4f} |"
+        )
+    return "\n".join(lines) + "\n"
+
+
 def _md_row(name: str, path: PathResult) -> str:
     scores = path.scores
     return (

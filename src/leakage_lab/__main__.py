@@ -14,7 +14,9 @@ from pathlib import Path
 
 from leakage_lab import DEFAULT_SEED, __version__
 from leakage_lab.catalog import run_shelf
-from leakage_lab.report import render_markdown, render_text, write_html
+from leakage_lab.exports import write_split_audit_exports
+from leakage_lab.provenance import SUMMARY_SEEDS, write_manifest
+from leakage_lab.report import render_markdown, render_multiseed_summary, render_text, write_html
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -34,6 +36,17 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="Also write a Markdown report to this path",
     )
+    shelf.add_argument("--manifest", type=Path, help="Also write the versioned input/split/environment manifest as JSON.")
+    shelf.add_argument(
+        "--multi-seed-summary",
+        action="store_true",
+        help="Append the predeclared seed summary (0, 7, 42); it never selects seeds from results.",
+    )
+    shelf.add_argument(
+        "--splitcheck-export",
+        type=Path,
+        help="Optionally write synthetic CSV fixtures for a separate split-audit tool; no tool dependency is imported.",
+    )
     shelf.add_argument(
         "--html",
         type=Path,
@@ -46,7 +59,14 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _shelf(seed: int, output: Path | None, html_path: Path | None) -> int:
+def _shelf(
+    seed: int,
+    output: Path | None,
+    html_path: Path | None,
+    manifest: Path | None,
+    multi_seed_summary: bool,
+    splitcheck_export: Path | None,
+) -> int:
     cards = run_shelf(seed)
     sys.stdout.write(render_text(cards, seed))
     if output is not None:
@@ -56,6 +76,15 @@ def _shelf(seed: int, output: Path | None, html_path: Path | None) -> int:
     if html_path is not None:
         write_html(cards, html_path, seed)
         print(f"Wrote {html_path}", file=sys.stderr)
+    if manifest is not None:
+        write_manifest(manifest, cards, seed)
+        print(f"Wrote {manifest}", file=sys.stderr)
+    if splitcheck_export is not None:
+        write_split_audit_exports(splitcheck_export, seed)
+        print(f"Wrote synthetic CSV fixtures to {splitcheck_export}", file=sys.stderr)
+    if multi_seed_summary:
+        runs = tuple((summary_seed, run_shelf(summary_seed)) for summary_seed in SUMMARY_SEEDS)
+        sys.stdout.write("\n" + render_multiseed_summary(runs))
     return 0
 
 
@@ -84,7 +113,14 @@ def main(argv: list[str] | None = None) -> int:
         argv = ["shelf"]
     args = parser.parse_args(argv)
     if args.command in (None, "shelf"):
-        return _shelf(args.seed, args.output, args.html)
+        return _shelf(
+            args.seed,
+            args.output,
+            args.html,
+            args.manifest,
+            args.multi_seed_summary,
+            args.splitcheck_export,
+        )
     if args.command == "serve":
         return _serve(args.seed, args.port)
     parser.error(f"Unknown command {args.command}")

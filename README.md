@@ -13,8 +13,10 @@ Seed **42**. ROC-AUC on the held-out rows. Accuracy, average precision, and the 
 | Experiment | What was planted | Leaky ROC-AUC | Clean ROC-AUC |
 | --- | --- | ---: | ---: |
 | [Future cost](docs/experiments/future-cost.md) | A day-60 cost that includes the readmission | 0.9712 | 0.7325 |
-| [Copied rows](docs/experiments/copied-rows.md) | Every claim pasted twice, then split by row | 0.9617 | 0.6978 |
+| [Copied rows](docs/experiments/copied-rows.md) | Every claim pasted twice, then split by row | 0.9618 | 0.6980 |
+| [Matched holdout copies](docs/experiments/matched-holdout.md) | Same holdout, with copies inserted into only one training path | 0.9089 | 0.7015 |
 | [Target encoding](docs/experiments/target-encoding.md) | `TargetEncoder.fit` on the whole table, then the split | 1.0000 | 0.7531 |
+| [Group-aware encoding](docs/experiments/group-aware-encoding.md) | Repeated members: train-only encoder with random rows versus group holdout | 0.9993 | 0.7440 |
 
 On the copied-rows card the forest is the model that memorizes a twin (accuracy 1.0000 on the copied test rows). A logistic regression on those same splits scores 0.7377 contaminated and 0.7350 clean. The dirty split flatters the forest and leaves the linear model where it was.
 
@@ -33,6 +35,8 @@ pip install -e ".[dev]"
 ```bash
 python -m leakage_lab shelf --seed 42
 python -m leakage_lab shelf --seed 42 --html docs/shelf.html
+python -m leakage_lab shelf --seed 42 --manifest reports/shelf-manifest.json
+python -m leakage_lab shelf --seed 42 --multi-seed-summary
 pytest
 ```
 
@@ -40,7 +44,9 @@ pytest
 
 `--output reports/shelf.md` writes a Markdown report. `reports/` is gitignored. The HTML shelf committed at [docs/shelf.html](docs/shelf.html) is the seed-42 run.
 
-A second run with seed 42 matches the first, including the scores above. Other seeds keep the same shape: the leaky path stays too good, and the clean path stays in the ordinary range. That is what `pytest` locks in.
+A second run with seed 42 matches the first, including the scores above and `docs/shelf.html`. `--manifest` records the synthetic input, split row counts, seed, runtime versions, and local-only constraints. `--multi-seed-summary` reports the predeclared set `0, 7, 42`; it does not select favorable seeds after seeing results.
+
+`--splitcheck-export DIR` writes optional synthetic CSV pairs for a separate split-audit tool. Leakage Lab Shelf does not import or require that tool. Student prompts and a separate answer key are in [docs/student-prompts.md](docs/student-prompts.md) and [docs/answer-key.md](docs/answer-key.md).
 
 ## How a card is scored
 
@@ -61,10 +67,14 @@ scikit-learn's own notes on this family of bugs: [Common pitfalls](https://sciki
 ```
 src/leakage_lab/                 shelf, scoring, text and HTML reports
 src/leakage_lab/experiments/     one module per planted leak
+src/leakage_lab/provenance.py    versioned run manifest and predeclared seed set
+src/leakage_lab/exports.py       optional standalone synthetic CSV exports
 tests/                           leaky vs clean, plus the seed-42 write-up
 docs/cover.jpg                   project cover
 docs/experiments/                what each card is doing
 docs/shelf.html                  seed-42 shelf, open in a browser
+docs/student-prompts.md          predict, trace, and repair exercises
+docs/answer-key.md               separate instructor answers
 ```
 
 ## License

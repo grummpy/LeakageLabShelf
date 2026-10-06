@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from leakage_lab.cards import ExperimentCard
-from leakage_lab.experiments import copied_rows, future_cost, target_encoding
+from leakage_lab.experiments import copied_rows, future_cost, group_encoding, matched_holdout, target_encoding
 
-EXPERIMENTS = (future_cost, copied_rows, target_encoding)
+EXPERIMENTS = (future_cost, copied_rows, matched_holdout, target_encoding, group_encoding)
 
 
 def run_shelf(seed: int) -> tuple[ExperimentCard, ...]:
