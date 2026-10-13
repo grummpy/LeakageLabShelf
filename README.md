@@ -22,7 +22,8 @@ On the copied-rows card the forest is the model that memorizes a twin (accuracy 
 
 ## Install
 
-Python 3.11 or newer. The dependency pins are exact so a second machine prints the same four-decimal scores.
+Python 3.11 or newer. The dependency pins make the numerical stack reviewable,
+but they do not turn a captured score table into a cross-platform benchmark.
 
 ```bash
 python -m venv .venv
@@ -42,9 +43,18 @@ pytest
 
 `python -m leakage_lab` with no arguments runs the shelf at seed 42. `leakage-lab serve` writes the same HTML and serves it at `http://127.0.0.1:8000/`.
 
-`--output reports/shelf.md` writes a Markdown report. `reports/` is gitignored. The HTML shelf committed at [docs/shelf.html](docs/shelf.html) is the seed-42 run.
+`--output reports/shelf.md` writes a Markdown report. `reports/` is gitignored.
+The HTML shelf committed at [docs/shelf.html](docs/shelf.html) is an illustrative
+seed-42 capture, not an assertion that every supported Python/platform runtime
+will print byte-identical scores.
 
-A second run with seed 42 matches the first, including the scores above and `docs/shelf.html`. `--manifest` records the synthetic input, split row counts, seed, runtime versions, and local-only constraints. Combined with `--multi-seed-summary`, it also retains every paired leaky/clean ROC-AUC result for the predeclared set `0, 7, 42`. The summary reports the paired-gap mean and range as descriptive synthetic output—not a confidence interval or real-world benchmark—and never selects favorable seeds after seeing results.
+A second run with seed 42 matches the first **in the same runtime**. Use
+`--manifest` whenever retaining or comparing a run: it records the synthetic
+input, split row counts, seed, source revision, and runtime versions. Combined
+with `--multi-seed-summary`, it also retains every paired leaky/clean ROC-AUC
+result for the predeclared set `0, 7, 42`. The summary reports the paired-gap
+mean and range as descriptive synthetic output—not a confidence interval or
+real-world benchmark—and never selects favorable seeds after seeing results.
 
 `--splitcheck-export DIR` writes optional synthetic CSV pairs for a separate split-audit tool. Leakage Lab Shelf does not import or require that tool. Student prompts and a separate answer key are in [docs/student-prompts.md](docs/student-prompts.md) and [docs/answer-key.md](docs/answer-key.md).
 
@@ -54,7 +64,9 @@ Both paths use the positive-class probability. ROC-AUC is the ranking metric. Av
 
 The data generator is `numpy.random.Generator` (PCG64) seeded with the same integer as the split and the estimator. Nothing here is a benchmark on real records.
 
-Measured with the pins in `pyproject.toml`: NumPy 2.2.6, pandas 2.3.3, scikit-learn 1.7.2, SciPy 1.14.1.
+The declared stack is NumPy 2.2.6, pandas 2.3.3, scikit-learn 1.7.2, and SciPy
+1.14.1. A saved manifest, rather than the table alone, is the evidence for a
+specific captured output.
 
 ## Related
 

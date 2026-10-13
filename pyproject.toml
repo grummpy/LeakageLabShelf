@@ -18,7 +18,9 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    # Pinned so a second machine prints the same four-decimal scores.
+    # Pinned to make the numerical stack reviewable. Exact output can still
+    # vary across Python builds and platform math libraries; retain a manifest
+    # with every result that needs to be compared.
     # scipy 1.14 keeps numpy below 2.3 and avoids an lbfgs option mismatch
     # that newer SciPy builds hit with this scikit-learn pin.
     "numpy==2.2.6",
