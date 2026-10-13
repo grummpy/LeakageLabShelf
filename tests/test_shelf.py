@@ -49,6 +49,9 @@ def test_html_shelf_lists_each_experiment(tmp_path):
         assert f'id="{slug}"' in text
     assert "0.9712" in text
     assert "SplitCheck" in text
+    assert '@media print' in text
+    assert 'id="shelf" tabindex="-1"' in text
+    assert "--manifest" in text
 
 
 def test_committed_html_is_an_illustrative_seed_42_capture():
