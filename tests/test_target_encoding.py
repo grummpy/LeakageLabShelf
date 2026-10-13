@@ -6,6 +6,12 @@ import numpy as np
 import pytest
 
 from leakage_lab.experiments import target_encoding
+
+
+def test_repeated_id_crossfit_does_not_replace_outer_group_holdout():
+    row_score, outer_score = target_encoding.repeated_id_outer_ablation(42)
+    assert row_score > outer_score
+    assert 0.0 <= outer_score <= 1.0
 from leakage_lab.metrics import fit_logistic
 
 SEEDS = (42, 0, 7)

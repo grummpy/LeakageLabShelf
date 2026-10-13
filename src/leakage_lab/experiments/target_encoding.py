@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, TargetEncoder
 
@@ -87,6 +87,34 @@ def cross_fit_encoding(frame: pd.DataFrame, y: np.ndarray, seed: int) -> np.ndar
 
     encoded = _encoder(seed).fit_transform(frame[[ID_FEATURE]], y)
     return np.asarray(encoded).ravel()
+
+
+def repeated_id_outer_ablation(seed: int) -> tuple[float, float]:
+    """Show why inner cross-fitting does not replace an outer group holdout.
+
+    This deliberately uses repeated synthetic ids.  The first score cross-fits
+    on the full table and then uses a row split, so the same member can inform
+    the encoding on both sides.  The second score holds members out before any
+    encoder fit.  It is a teaching ablation, not a real-data benchmark.
+    """
+    frame = generate(seed).copy()
+    frame[ID_FEATURE] = [f"member-{row // 4:04d}" for row in range(len(frame))]
+    y = frame[TARGET].to_numpy()
+    row_train, row_test = split_indices(y, seed)
+    crossed = _leaky_frame(frame, cross_fit_encoding(frame, y, seed))
+    row_score = fit_logistic(crossed.iloc[row_train], y[row_train], crossed.iloc[row_test], y[row_test], seed).roc_auc
+    groups = frame[ID_FEATURE].to_numpy()
+    outer = KFold(n_splits=4, shuffle=True, random_state=seed)
+    train_members, test_members = next(outer.split(np.unique(groups)))
+    held_out = set(np.unique(groups)[test_members])
+    test_mask = np.array([group in held_out for group in groups])
+    train = frame.loc[~test_mask]
+    test = frame.loc[test_mask]
+    encoder = _encoder(seed).fit(train[[ID_FEATURE]], train[TARGET])
+    design_train = _leaky_frame(train, np.asarray(encoder.transform(train[[ID_FEATURE]])).ravel())
+    design_test = _leaky_frame(test, np.asarray(encoder.transform(test[[ID_FEATURE]])).ravel())
+    outer_score = fit_logistic(design_train, train[TARGET].to_numpy(), design_test, test[TARGET].to_numpy(), seed).roc_auc
+    return float(row_score), float(outer_score)
 
 
 def _leaky_frame(frame: pd.DataFrame, encoded: np.ndarray) -> pd.DataFrame:

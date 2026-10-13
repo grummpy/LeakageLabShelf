@@ -301,6 +301,15 @@ footer {{
   font-size: 0.95rem;
 }}
 footer a {{ color: var(--cream); }}
+@media print {{
+  :root {{ --bg: #fff; --panel: #fff; --ink: #111; --muted: #333; --line: #777; }}
+  body {{ background: #fff; color: #111; font-size: 10pt; }}
+  main {{ max-width: none; padding: 0; }}
+  .cover {{ max-height: 3in; object-fit: cover; }}
+  article {{ break-inside: avoid; border-color: #777; box-shadow: none; }}
+  .path {{ background: #fff; }}
+  a {{ color: #111; text-decoration: underline; }}
+}}
 @media (max-width: 700px) {{
   .paths {{ grid-template-columns: 1fr; }}
   h1 {{ font-size: 2rem; }}
@@ -308,12 +317,12 @@ footer a {{ color: var(--cream); }}
 </style>
 </head>
 <body>
-<main>
+<main id="shelf" tabindex="-1">
 {cover}
 <h1>Leakage Lab Shelf</h1>
 <p class="tagline">Planted failure cases beside clean controls. Synthetic tables, fixed seed {seed}.</p>
 <p class="verbs">Inspect data flow · Trace leakage · Build cleaner models</p>
-<p class="note">Accuracy uses a probability cutoff of 0.5. ROC-AUC and average precision use the positive-class probability. A high leaky score means that pipeline failed the audit.</p>
+<p class="note">Accuracy uses a probability cutoff of 0.5. ROC-AUC and average precision use the positive-class probability. A high leaky score means that pipeline failed the audit. For a reproducible score record, save the local <code>--manifest</code> output with the report.</p>
 {articles}
 <footer>
 <p>Companion checker for a split you already have: <a href="https://github.com/grummpy/SplitCheck">SplitCheck</a>. This shelf does not import it.</p>
