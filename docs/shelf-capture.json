@@ -1,0 +1,15 @@
+{
+  "artifact": "docs/shelf.html",
+  "capture_source_revision": "722b31439bd47bbab8ed001b35c54f378049b0b9",
+  "dependency_pins": {
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "scikit-learn": "1.7.2",
+    "scipy": "1.14.1"
+  },
+  "purpose": "Canonical CI capture for the illustrative seed-42 shelf; not a cross-platform benchmark.",
+  "runtime": {
+    "python": "3.12.15"
+  },
+  "seed": 42
+}
