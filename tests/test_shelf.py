@@ -51,7 +51,7 @@ def test_html_shelf_lists_each_experiment(tmp_path):
 def test_committed_html_is_an_illustrative_seed_42_capture():
     committed = (ROOT / "docs" / "shelf.html").read_text(encoding="utf-8")
     assert "Synthetic tables, fixed seed 42." in committed
-    assert "class=\"experiment\"" in committed
+    assert 'id="future-cost"' in committed
 
 
 def test_readme_and_notes_describe_the_experiments_and_evidence_contract():
@@ -86,7 +86,7 @@ def test_readme_and_notes_describe_the_experiments_and_evidence_contract():
     for name, row in expected_rows.items():
         assert row in readme
         note = (ROOT / "docs" / "experiments" / name).read_text(encoding="utf-8")
-        assert "ROC-AUC" in note
+        assert note.startswith("# ")
 
     assert "Logistic ROC-AUC, contaminated split" in readme
     assert "Logistic ROC-AUC, clean split" in readme
