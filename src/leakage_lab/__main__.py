@@ -68,6 +68,7 @@ def _shelf(
     splitcheck_export: Path | None,
 ) -> int:
     cards = run_shelf(seed)
+    summary_runs = tuple((summary_seed, run_shelf(summary_seed)) for summary_seed in SUMMARY_SEEDS) if multi_seed_summary else ()
     sys.stdout.write(render_text(cards, seed))
     if output is not None:
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -77,14 +78,13 @@ def _shelf(
         write_html(cards, html_path, seed)
         print(f"Wrote {html_path}", file=sys.stderr)
     if manifest is not None:
-        write_manifest(manifest, cards, seed)
+        write_manifest(manifest, cards, seed, multi_seed_runs=summary_runs)
         print(f"Wrote {manifest}", file=sys.stderr)
     if splitcheck_export is not None:
         write_split_audit_exports(splitcheck_export, seed)
         print(f"Wrote synthetic CSV fixtures to {splitcheck_export}", file=sys.stderr)
     if multi_seed_summary:
-        runs = tuple((summary_seed, run_shelf(summary_seed)) for summary_seed in SUMMARY_SEEDS)
-        sys.stdout.write("\n" + render_multiseed_summary(runs))
+        sys.stdout.write("\n" + render_multiseed_summary(summary_runs))
     return 0
 
 

@@ -38,8 +38,10 @@ def test_manifest_summary_and_csv_exports_are_optional_and_standalone(tmp_path, 
     export_dir = tmp_path / "exports"
     assert main(["shelf", "--seed", "42", "--manifest", str(manifest), "--splitcheck-export", str(export_dir)]) == 0
     payload = json.loads(manifest.read_text(encoding="utf-8"))
-    assert payload["manifest_version"] == 1
+    assert payload["manifest_version"] == 2
     assert payload["seed"] == 42
+    assert len(payload["source"]["revision"] or "") == 40
+    assert payload["dependency_pins"]["scikit-learn"] == "1.7.2"
     assert payload["constraints"]["network"] == "not used"
     assert len(payload["experiments"]) == 5
     assert (export_dir / "copied_rows_train.csv").is_file()
@@ -55,3 +57,19 @@ def test_predeclared_multi_seed_summary_is_available_without_seed_selection(caps
     out = capsys.readouterr().out
     assert "Predeclared multi-seed summary" in out
     assert "Seeds: 0, 7, 42" in out
+    assert "Paired leaky-minus-clean gap" in out
+    assert "not a confidence interval" in out
+
+
+def test_multi_seed_manifest_retains_each_paired_result(tmp_path):
+    manifest = tmp_path / "manifest.json"
+    assert main(["shelf", "--manifest", str(manifest), "--multi-seed-summary"]) == 0
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
+    summary = payload["predeclared_multi_seed"]
+    assert summary["seeds"] == [0, 7, 42]
+    assert len(summary["paired_roc_auc_results"]) == 3
+    first = summary["paired_roc_auc_results"][0]
+    assert first["seed"] == 0
+    assert len(first["experiments"]) == 5
+    for experiment in first["experiments"]:
+        assert experiment["paired_roc_auc_gap"] == experiment["leaky_roc_auc"] - experiment["clean_roc_auc"]

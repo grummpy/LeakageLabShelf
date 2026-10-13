@@ -44,7 +44,7 @@ pytest
 
 `--output reports/shelf.md` writes a Markdown report. `reports/` is gitignored. The HTML shelf committed at [docs/shelf.html](docs/shelf.html) is the seed-42 run.
 
-A second run with seed 42 matches the first, including the scores above and `docs/shelf.html`. `--manifest` records the synthetic input, split row counts, seed, runtime versions, and local-only constraints. `--multi-seed-summary` reports the predeclared set `0, 7, 42`; it does not select favorable seeds after seeing results.
+A second run with seed 42 matches the first, including the scores above and `docs/shelf.html`. `--manifest` records the synthetic input, split row counts, seed, runtime versions, and local-only constraints. Combined with `--multi-seed-summary`, it also retains every paired leaky/clean ROC-AUC result for the predeclared set `0, 7, 42`. The summary reports the paired-gap mean and range as descriptive synthetic output—not a confidence interval or real-world benchmark—and never selects favorable seeds after seeing results.
 
 `--splitcheck-export DIR` writes optional synthetic CSV pairs for a separate split-audit tool. Leakage Lab Shelf does not import or require that tool. Student prompts and a separate answer key are in [docs/student-prompts.md](docs/student-prompts.md) and [docs/answer-key.md](docs/answer-key.md).
 

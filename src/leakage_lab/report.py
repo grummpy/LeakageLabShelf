@@ -121,12 +121,21 @@ def render_multiseed_summary(runs: tuple[tuple[int, tuple[ExperimentCard, ...]],
         return ""
     seeds = ", ".join(str(seed) for seed, _cards in runs)
     by_slug = {card.slug: card.title for card in runs[0][1]}
-    lines = ["Predeclared multi-seed summary", f"Seeds: {seeds}", "", "| Experiment | Leaky ROC-AUC range | Clean ROC-AUC range |", "| --- | --- | --- |"]
+    lines = [
+        "Predeclared multi-seed summary",
+        f"Seeds: {seeds} (n={len(runs)} paired synthetic runs)",
+        "Descriptive only: these fixed synthetic seeds are not a confidence interval or a real-world benchmark.",
+        "",
+        "| Experiment | Leaky ROC-AUC range | Clean ROC-AUC range | Paired leaky-minus-clean gap (mean; range) |",
+        "| --- | --- | --- | --- |",
+    ]
     for slug, title in by_slug.items():
         leaky = [next(card for card in cards if card.slug == slug).leaky.scores.roc_auc for _seed, cards in runs]
         clean = [next(card for card in cards if card.slug == slug).clean.scores.roc_auc for _seed, cards in runs]
+        gaps = [leaky_score - clean_score for leaky_score, clean_score in zip(leaky, clean)]
         lines.append(
-            f"| {title} | {min(leaky):.4f}–{max(leaky):.4f} | {min(clean):.4f}–{max(clean):.4f} |"
+            f"| {title} | {min(leaky):.4f}–{max(leaky):.4f} | {min(clean):.4f}–{max(clean):.4f} | "
+            f"{sum(gaps) / len(gaps):+.4f}; {min(gaps):+.4f}–{max(gaps):+.4f} |"
         )
     return "\n".join(lines) + "\n"
 
