@@ -1,0 +1,7 @@
+{
+  "artifact": "docs/shelf.html",
+  "capture_status": "legacy illustrative capture; original runtime provenance is incomplete",
+  "sha256": "46578abc5cadd682f6a636e037eed9e9b198e7d87c694f7e99278724e72e048b",
+  "seed": 42,
+  "use": "Do not compare this static score table with a newly generated run. Regenerate and retain a manifest only after a fully specified environment is approved."
+}

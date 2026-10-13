@@ -46,7 +46,12 @@ pytest
 `--output reports/shelf.md` writes a Markdown report. `reports/` is gitignored.
 The HTML shelf committed at [docs/shelf.html](docs/shelf.html) is an illustrative
 seed-42 capture, not an assertion that every supported Python/platform runtime
-will print byte-identical scores.
+will print byte-identical scores. Its checked-in capture contract is
+[docs/shelf-capture.json](docs/shelf-capture.json): the legacy HTML's original
+runtime provenance is incomplete, so it is hash-bound as an illustrative
+artifact and never compared with a newly generated score table. A future
+replacement requires a fully specified, approved capture environment and a
+saved manifest.
 
 A second run with seed 42 matches the first **in the same runtime**. Use
 `--manifest` whenever retaining or comparing a run: it records the synthetic
