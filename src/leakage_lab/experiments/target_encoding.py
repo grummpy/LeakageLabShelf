@@ -157,7 +157,7 @@ def run(seed: int) -> ExperimentCard:
     )
     return ExperimentCard(
         slug="target-encoding",
-        number=3,
+        number=4,
         title="Target encoding",
         kicker="Preprocessing fit on the full table before the split",
         mechanism=MECHANISM,

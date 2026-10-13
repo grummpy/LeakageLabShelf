@@ -194,31 +194,62 @@ footer a { color: var(--cream); }
 
 <div class="path leaky">
 <p class="name">Leaky</p>
-<p class="auc">0.9617</p>
+<p class="auc">0.9618</p>
 <p class="sub">ROC-AUC</p>
-<p class="sub">Accuracy 0.8917 · AP 0.9597</p>
+<p class="sub">Accuracy 0.8917 · AP 0.9599</p>
 <p class="sub">1680 train rows · 720 test rows</p>
 </div>
 
 
 <div class="path clean">
 <p class="name">Clean</p>
-<p class="auc">0.6978</p>
+<p class="auc">0.6980</p>
 <p class="sub">ROC-AUC</p>
-<p class="sub">Accuracy 0.6583 · AP 0.7066</p>
+<p class="sub">Accuracy 0.6611 · AP 0.7070</p>
 <p class="sub">840 train rows · 360 test rows</p>
 </div>
 
 </div>
 <p class="gap">ROC-AUC gap (leaky minus clean): +0.2639</p>
 <p>The leaky pipeline appends a second copy of every claim, keeping the same row_id, and then takes a stratified row split. A test row can be the twin of a training row. The clean pipeline splits the original table, where each row_id appears once. Both paths train the same random forest (200 trees, min_samples_leaf=1, n_jobs=1). An exact copy has the same features as its twin, so trees that saw the twin vote its label. The card separates accuracy on those copied test rows from accuracy on the rows that were new. A logistic regression on the same two splits cannot memorize a twin; it shows what the features support when the model does not recall the row.</p>
-<p>502 of 720 leaky test rows share a row_id with training. The forest&#x27;s accuracy on those copied rows is 1.0000. On the leaky test rows that are not copies, accuracy is 0.6422. The clean split shares none; forest ROC-AUC there is 0.6978, against 0.9617 on the contaminated split. Logistic regression is 0.7377 contaminated and 0.7350 clean.</p>
+<p>502 of 720 leaky test rows share a row_id with training. The forest&#x27;s accuracy on those copied rows is 1.0000. On the leaky test rows that are not copies, accuracy is 0.6422. The clean split shares none; forest ROC-AUC there is 0.6980, against 0.9618 on the contaminated split. Logistic regression is 0.7377 contaminated and 0.7350 clean.</p>
 <table><tr><th>Leaky test rows also in train</th><td>502 of 720</td></tr><tr><th>Clean test rows also in train</th><td>0 of 360</td></tr><tr><th>Forest accuracy on copied leaky test rows</th><td>1.0000</td></tr><tr><th>Forest accuracy on new leaky test rows</th><td>0.6422</td></tr><tr><th>Logistic ROC-AUC, contaminated split</th><td>0.7377</td></tr><tr><th>Logistic ROC-AUC, clean split</th><td>0.7350</td></tr><tr><th>Positive rate</th><td>0.5083</td></tr></table>
 </article>
 
 
+<article id="matched-holdout-copies">
+<p class="kicker">Experiment 3 · Copied rows, same holdout on both paths</p>
+<h2>Matched holdout copies</h2>
+<p class="population">1,200 synthetic claims; one fixed holdout scored by both paths</p>
+<div class="paths">
+
+<div class="path leaky">
+<p class="name">Leaky</p>
+<p class="auc">0.9089</p>
+<p class="sub">ROC-AUC</p>
+<p class="sub">Accuracy 0.8278 · AP 0.9158</p>
+<p class="sub">1020 train rows · 360 test rows</p>
+</div>
+
+
+<div class="path clean">
+<p class="name">Clean</p>
+<p class="auc">0.7015</p>
+<p class="sub">ROC-AUC</p>
+<p class="sub">Accuracy 0.6444 · AP 0.7134</p>
+<p class="sub">1020 train rows · 360 test rows</p>
+</div>
+
+</div>
+<p class="gap">ROC-AUC gap (leaky minus clean): +0.2074</p>
+<p>This is a separate, matched holdout comparison. Both paths score the exact same untouched test table. Each training table has the same row count: the contaminated one receives copies of half the holdout claims, while the control receives an equal number of copies drawn from its own training rows. The model and holdout do not change. Only the presence of copied holdout rows in training changes, so the score difference is directly attributable to contamination.</p>
+<p>Both paths score the same 360 holdout rows. The contaminated training set contains copies of 180 of them, while the control has the same training row count with no holdout copies. The leaky forest reaches ROC-AUC 0.9089; the clean forest reaches 0.7015. Accuracy is 1.0000 on copied holdout rows and 0.6556 on untouched holdout rows.</p>
+<table><tr><th>Shared holdout rows</th><td>360</td></tr><tr><th>Copied holdout rows in contaminated training</th><td>180 of 360</td></tr><tr><th>Clean training rows matching holdout</th><td>0</td></tr><tr><th>Forest accuracy on copied holdout rows</th><td>1.0000</td></tr><tr><th>Forest accuracy on untouched holdout rows</th><td>0.6556</td></tr></table>
+</article>
+
+
 <article id="target-encoding">
-<p class="kicker">Experiment 3 · Preprocessing fit on the full table before the split</p>
+<p class="kicker">Experiment 4 · Preprocessing fit on the full table before the split</p>
 <h2>Target encoding</h2>
 <p class="population">2,000 synthetic intake rows, one row per member id</p>
 <div class="paths">
@@ -245,6 +276,37 @@ footer a { color: var(--cream); }
 <p>member_id is a different string on every row. It identifies that row and nothing else. The leaky pipeline fits sklearn&#x27;s TargetEncoder (smooth=&#x27;auto&#x27;, target_type=&#x27;binary&#x27;) on the whole table and only then splits. For a category that appears once, the value stored by fit and read back by transform is that row&#x27;s label, so the test matrix already contains the answer. The clean pipeline splits first. The encoder sits inside a Pipeline and is fit on the training rows only. Every test id is unseen, and TargetEncoder fills unseen categories with the training prevalence, a constant on the test set. fit_transform is a different call: it cross-fits, so a row does not receive an encoding built from its own label. Cross-fitting the full table is still the wrong order when a category appears on both sides of a later split. It is not the call the leaky path makes, and on these unique ids it does not paste the label back.</p>
 <p>The encoding from fit on the full table matches the label on every row (True). Leaky ROC-AUC is 1.0000. The clean encoder is fit on 1500 training rows, and its encoding of the 500 test ids has standard deviation 0.0000. Clean ROC-AUC is 0.7531. fit_transform on the same full table correlates with the label at -0.0025.</p>
 <table><tr><th>Leaky encoding equals the label on every row</th><td>True</td></tr><tr><th>Clean test-encoding standard deviation</th><td>0.0000</td></tr><tr><th>Correlation of fit_transform(full table) with the label</th><td>-0.0025</td></tr><tr><th>Test rows, shared by both paths</th><td>500</td></tr><tr><th>Positive rate</th><td>0.4440</td></tr></table>
+</article>
+
+
+<article id="group-aware-encoding">
+<p class="kicker">Experiment 5 · Target encoding needs a group split, not just train-only fit</p>
+<h2>Group-aware repeated-entity encoding</h2>
+<p class="population">360 synthetic members, 3 visits each</p>
+<div class="paths">
+
+<div class="path leaky">
+<p class="name">Leaky</p>
+<p class="auc">0.9993</p>
+<p class="sub">ROC-AUC</p>
+<p class="sub">Accuracy 0.9815 · AP 0.9994</p>
+<p class="sub">810 train rows · 270 test rows</p>
+</div>
+
+
+<div class="path clean">
+<p class="name">Clean</p>
+<p class="auc">0.7440</p>
+<p class="sub">ROC-AUC</p>
+<p class="sub">Accuracy 0.6407 · AP 0.6600</p>
+<p class="sub">810 train rows · 270 test rows</p>
+</div>
+
+</div>
+<p class="gap">ROC-AUC gap (leaky minus clean): +0.2554</p>
+<p>Each member has repeated visits and one stable outcome. The leaky path uses a random row split, but still fits the target encoder on training rows only. That is not enough: another visit from the same member is often in training, so the encoded member id carries the outcome into test. The clean path uses a group split by member_id and keeps the same encoder inside the training-only pipeline. Every clean-test member is unseen, so the encoder falls back to the training prevalence.</p>
+<p>The random split shares 218 entities across train and test; its training-only encoder still reaches ROC-AUC 0.9993. The group split shares 0 entities, fits the same pipeline on training rows only, and reaches 0.7440. The clean test encoding has standard deviation 0.0000, because every member id is unseen.</p>
+<table><tr><th>Entities shared by random split</th><td>218</td></tr><tr><th>Entities shared by group split</th><td>0</td></tr><tr><th>Random test-encoding standard deviation</th><td>0.4880</td></tr><tr><th>Group-holdout test-encoding standard deviation</th><td>0.0000</td></tr><tr><th>Fit boundary</th><td>TargetEncoder remains inside each training-only pipeline</td></tr></table>
 </article>
 
 <footer>

@@ -12,9 +12,9 @@ Same forest on both paths: 200 trees, `min_samples_leaf=1`, `max_features="sqrt"
 
 ## Seed 42
 
-Seed 42: leaky ROC-AUC 0.9617, clean ROC-AUC 0.6978.
+Seed 42: leaky ROC-AUC 0.9618, clean ROC-AUC 0.6980.
 
-502 of 720 leaky test rows share a `row_id` with training. Accuracy on those copied rows is 1.0000. Accuracy on the leaky test rows that are new is 0.6422, in the same neighborhood as the clean forest's accuracy of 0.6583. The headline 0.9617 is that mixture.
+502 of 720 leaky test rows share a `row_id` with training. Accuracy on those copied rows is 1.0000. Accuracy on the leaky test rows that are new is 0.6422, in the same neighborhood as the clean forest's accuracy of 0.6583. The headline 0.9618 is that mixture.
 
 A logistic regression on the same two splits scores 0.7377 contaminated and 0.7350 clean. It cannot recall a twin, and the duplicated rows do not hand it new signal. The features support a linear ROC-AUC around 0.74. The forest on the clean split is a bit weaker than that, which is an ordinary random forest on a smooth boundary with noise columns. The forest on the contaminated split is the one that has seen the answer already.
 
