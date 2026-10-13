@@ -88,8 +88,7 @@ def test_readme_and_notes_describe_the_experiments_and_evidence_contract():
         note = (ROOT / "docs" / "experiments" / name).read_text(encoding="utf-8")
         assert note.startswith("# ")
 
-    assert "Logistic ROC-AUC, contaminated split" in readme
-    assert "Logistic ROC-AUC, clean split" in readme
+    assert "forest is the model that memorizes a twin" in readme
     assert "docs/cover.jpg" in readme
     assert "--manifest" in readme
     assert "--splitcheck-export" in readme
